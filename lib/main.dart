@@ -31,7 +31,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late PageViewHolder holder;
   late PageController _controller;
-  double fraction = 0.50;
+  double fraction =
+      0.57; // By using this fraction, we're telling the PageView to show the 50% of the previous and the next page area along with the main page
 
   @override
   void initState() {
@@ -94,14 +95,48 @@ class MyPage extends StatelessWidget {
       ..setEntry(1, 1, fraction!) //Changing Scale Along Y Axis
       ..setEntry(3, 0, 0.004 * -diff); //Changing Perspective Along X Axis
 
-    return Transform(
-      transform: pvMatrix,
+    final Matrix4 shadowMatrix = Matrix4.identity()
+      ..setEntry(3, 3, 1 / 1.6) //Increasing Scale by 60%
+      ..setEntry(3, 1, -0.004) //Changing Scale Along Y Axis
+      ..setEntry(3, 0, 0.002 * diff) //Changing Perspective along X Axis
+      ..rotateX(1.309); //Rotating Shadow along X Axis
+
+    return Stack(
+      fit: StackFit.expand,
       alignment: FractionalOffset.center,
-      child: Container(
-        child: Image.asset("assets/images/image_${number.toInt() + 1}.jpg",
-            fit: BoxFit
-                .fill), //Fill the target box by distorting the source's aspect ratio.
-      ),
+      children: <Widget>[
+        /*if (diff <= 1.0 && diff >= -1.0) ...[
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 100),
+            opacity: 1 - diff.abs(),
+            child: Transform(
+              transform: shadowMatrix,
+              alignment: FractionalOffset.bottomCenter,
+              child: Container(
+                decoration: const BoxDecoration(boxShadow: [
+                  BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 10.0,
+                      spreadRadius: 1.0)
+                ]),
+              ),
+            ),
+          ),
+        ],*/
+        Material(
+          elevation: 50,
+          child: Transform(
+            transform: pvMatrix,
+            alignment: FractionalOffset.center,
+            child: Container(
+              child: Image.asset(
+                  "assets/images/image_${number.toInt() + 1}.jpg",
+                  fit: BoxFit
+                      .fill), //Fill the target box by distorting the source's aspect ratio.
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
